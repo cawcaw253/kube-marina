@@ -1,0 +1,81 @@
+- hosts: all
+  remote_user: ubuntu
+  become: yes
+  become_method: sudo
+  become_user: root
+  tasks:
+    - name: Add wheel group
+      group:
+        name: wheel
+        state: present
+
+    # ---------- Docker ----------
+    - name: Docker Installation
+      apt:
+        name: docker.io
+        state: present
+        update_cache: true
+
+    - name: Install apt trransport https
+      apt:
+        name: apt-transport-https
+        state: present
+      
+    - name: Add user to docker group
+      command: sudo usermod -a -G docker ubuntu
+
+    - name: Changing docker cgroup
+      blockinfile:
+        path: "/etc/docker/daemon.json"
+        create: yes
+        marker: ""
+        block:
+          "{\n
+            \"exec-opts\": [\"native.cgroupdriver=systemd\"]\n
+          }"
+
+    - name: Restarting docker services
+      service:
+        name: "docker"
+        state: restarted
+
+    # ---------- Kubernetes ----------
+    - name: Make the swap inactive
+      command: swapoff -a
+
+    - name: Remove swap entry from /etc/fstab.
+      lineinfile:
+        dest: /etc/fstab
+        regexp: swap
+        state: absent
+
+    - name: Add kubernetes apt-key for apt repository
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+
+    - name: Add kubernetes apt repository
+      apt_repository:
+        repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+        filename: 'kubernetes'
+
+    - name: Install kubelet
+      apt:
+        name: kubelet
+        state: present
+        update_cache: true
+
+    - name: Install kubeadm
+      apt:
+        name: kubeadm
+        state: present
+
+- hosts: master
+  become: yes
+  tasks:
+    - name: install kubectl
+      apt:
+        name: kubectl
+        state: present
+        force: yes

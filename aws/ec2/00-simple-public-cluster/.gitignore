@@ -1,0 +1,8 @@
+kube_hosts
+join-command
+
+aws.credentials
+terraform.tfvars
+
+terraform.tfstate*
+.terraform*

@@ -1,0 +1,9 @@
+aws_region = "ap-northeast-2"
+
+vpc_cidr = "10.0.0.0/16"
+public_subnet_cidr = ["10.0.0.0/24", "10.0.1.0/24"]
+
+ssh_key = "~/.ssh/example-key"
+
+instance_type = "t2.medium"
+instance_ami  = "ami-0454bb2fefc7de534"
