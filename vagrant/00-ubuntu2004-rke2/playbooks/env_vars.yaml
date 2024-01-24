@@ -1,0 +1,3 @@
+CONFDIR: "/etc/rancher/rke2"
+
+INSTALL_RKE2_VERSION: "v1.22.4+rke2r2" # Change with your preferred version.

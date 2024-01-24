@@ -1,0 +1,1 @@
+https://blog.devgenius.io/automating-installation-of-ha-rke2-kubernetes-cluster-with-ansible-2456cc95d970

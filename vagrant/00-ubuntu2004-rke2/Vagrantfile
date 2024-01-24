@@ -1,0 +1,31 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/ubuntu2004"
+  config.vm.synced_folder "./shared", "/mnt/shared"
+
+  config.vm.provider "vmware_desktop" do |vmware|
+    vmware.vmx["memsize"] = "4096"
+    vmware.vmx["numvcpus"] = "4"
+    vmware.allowlist_verified = true
+  end
+
+  (1..1).each do |i|
+    config.vm.define vm_name = "%s%01d" % ["master-", i] do |config|
+      config.vm.hostname = vm_name
+      config.vm.network "private_network", ip: ip = "%s%01d" % ["10.0.0.", i]
+
+      config.vm.provision "ansible" do |ansible|
+        ansible.playbook = "playbook/master.yml"
+      end
+    end
+  end
+
+  # (1..1).each do |i|
+  #   config.vm.define vm_name = "%s%01d" % ["worker-", i] do |config|
+  #     config.vm.hostname = vm_name
+  #     config.vm.network "private_network", ip: ip = "%s%01d" % ["10.0.1.", i]
+  #   end
+  # end
+end

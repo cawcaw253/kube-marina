@@ -1,0 +1,30 @@
+---
+- name: Install rke2 server instance
+  hosts: all
+  become: true
+  vars_files:
+    - env_vars.yaml 
+
+  tasks:
+  - name: Creates directory
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+      recurse: yes
+    loop:
+      - "{{ CONFDIR }}"
+
+  - name: Installing rke2 server
+    shell: |
+      curl -sfL https://get.rke2.io | INSTALL_RKE2_CHANNEL=stable INSTALL_RKE2_VERSION="{{ INSTALL_RKE2_VERSION }}" sh -
+    notify: "rke2-server service start"
+
+  handlers:
+    - name: Make sure a service unit is running
+      systemd:
+        state: started
+        name: rke2-server
+      listen: "rke2-server service start"
